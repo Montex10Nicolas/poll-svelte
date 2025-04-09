@@ -1,10 +1,12 @@
 import { db } from "$lib/server/db";
 import { poll } from "$lib/server/db/schema";
+import { sql } from "drizzle-orm";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async() => {
+	const lastFiveEntries = await db.select().from(poll).limit(5).orderBy(sql`${poll.createdAt} desc`);
 	return {
-		serverMessage: "Hello I'm server"
+		lastFiveEntries
 	}
 }
 
