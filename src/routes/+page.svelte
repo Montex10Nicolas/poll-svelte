@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { ddmmYYYY } from "$lib/date";
+  import { ddmmYYYY, hhmm } from "$lib/date";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -39,7 +39,7 @@
     </form>
 
     {#if data.latestPoll.length}
-      <div class="w-2/4 rounded-xl bg-cyan-700 p-3">
+      <div class="grid w-2/4 gap-3 rounded-xl bg-cyan-700 p-3">
         {#each data.latestPoll as pollValue}
           <div
             class="flex cursor-pointer items-center justify-around rounded-xl bg-cyan-300 p-4 transition-all duration-150 ease-in-out hover:scale-[102%]"
@@ -47,6 +47,7 @@
             <h1 class="text-lg font-bold">{pollValue.message}</h1>
             <p class="text-sm text-black/60">
               {ddmmYYYY(pollValue.createdAt as string)}
+              {hhmm(pollValue.createdAt as string)}
             </p>
           </div>
         {/each}
