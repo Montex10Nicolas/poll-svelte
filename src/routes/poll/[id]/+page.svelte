@@ -6,14 +6,30 @@
   const poll = data.result;
   const options = data.pollOptions;
 
-  let value = $state();
-</script>
+  let value = $state("");
 
-<pre class="absolute opacity-60">
-<code>
-        {JSON.stringify(data, null, 2)}
-</code>
-</pre>
+  let changed = $state(new Map<number, boolean>());
+  let optimisticVotes = $state(new Map<number, number>());
+  function voted(
+    optionId: number,
+    votes: number,
+    operation: "INCREASE" | "DECREASE",
+  ) {
+    let current = 0;
+    if (changed.get(optionId)) {
+      current = optimisticVotes.get(optionId)!;
+    } else {
+      current = votes;
+    }
+
+    changed.set(optionId, true);
+    if (operation === "INCREASE") {
+      optimisticVotes.set(optionId, current + 1);
+    } else {
+      optimisticVotes.set(optionId, current - 1);
+    }
+  }
+</script>
 
 <section class="flex flex-col items-center gap-40 pt-8">
   <div class="w-96 rounded-xl bg-cyan-600 p-4 text-center text-2xl">
@@ -30,15 +46,30 @@
         class="w-full rounded-xl bg-cyan-50 p-4"
       />
     </form>
-    {#each data.pollOptions as options}
+    {#each options as option}
       <div
         class="my-4 flex items-center justify-between rounded-xl bg-cyan-800 px-2"
       >
-        <h2>{options.opinion}</h2>
+        <h2>{option.opinion}</h2>
         <div class="flex flex-col">
-          <button>+</button>
-          <p>{options.votes}</p>
-          <button>-</button>
+          <form method="POST" use:enhance>
+            <button
+              onclick={() => voted(option.id, option.votes, "INCREASE")}
+              class="cursor-pointer"
+              formaction={`?/increaseVote&opinionId=${option.id}`}>+</button
+            >
+            <!-- This is not working as I expected -->
+            <p>
+              {changed.get(option.id)
+                ? optimisticVotes.get(option.id)
+                : option.votes}
+            </p>
+            <button
+              onclick={() => voted(option.id, option.votes, "DECREASE")}
+              class="cursor-pointer"
+              formaction={`?/decreaseVote&opinionId=${option.id}`}>-</button
+            >
+          </form>
         </div>
       </div>
     {/each}

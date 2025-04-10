@@ -13,6 +13,6 @@ export const options = sqliteTable("options", {
   pollId: integer("pollId")
     .references(() => poll.id)
     .notNull(),
-  votes: integer("votes").default(0),
+  votes: integer("votes").default(0).notNull(),
   createdAt: text("createdAt").default(sql`current_timestamp`),
 });
