@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { SvelteMap } from "svelte/reactivity";
   import type { PageProps } from "./$types";
 
   const { data }: PageProps = $props();
@@ -8,8 +9,8 @@
 
   let value = $state("");
 
-  let changed = $state(new Map<number, boolean>());
-  let optimisticVotes = $state(new Map<number, number>());
+  let changed = new SvelteMap<number, boolean>();
+  let optimisticVotes = new SvelteMap<number, number>();
   function voted(
     optionId: number,
     votes: number,
