@@ -18,7 +18,8 @@ export const load: PageServerLoad = async function ({ params }) {
   const pollOptions = await db
     .select()
     .from(options)
-    .where(eq(options.pollId, id));
+    .where(eq(options.pollId, id))
+    .orderBy(sql`${options.createdAt} DESC`);
 
   return {
     result: result[0],
@@ -66,10 +67,16 @@ export const actions = {
     const data = await request.formData();
     const opi = data.get("opinion") as string;
 
-    await db.insert(options).values({
-      pollId: pollId,
-      opinion: opi,
-    });
+    const option = await db
+      .insert(options)
+      .values({
+        pollId: pollId,
+        opinion: opi,
+      })
+      .returning();
+    return {
+      option: option,
+    };
   },
   increaseVote: async ({ url }) => {
     increaseOrDecreseOpinion(url, "INCREASE");

@@ -2,10 +2,11 @@
   import { enhance } from "$app/forms";
   import { SvelteMap } from "svelte/reactivity";
   import type { PageProps } from "./$types";
+  const { data, form }: PageProps = $props();
 
-  const { data }: PageProps = $props();
   const poll = data.result;
   const options = data.pollOptions;
+  let optionShown = $state(options);
 
   let value = $state("");
 
@@ -30,6 +31,14 @@
       optimisticVotes.set(optionId, current - 1);
     }
   }
+
+  $effect(() => {
+    if (form && form.option !== null && form.option?.length) {
+      const newOption = form.option[0];
+      optionShown.unshift(newOption);
+      form.option.pop();
+    }
+  });
 </script>
 
 <section class="flex flex-col items-center gap-40 pt-8">
@@ -47,7 +56,7 @@
         class="w-full rounded-xl bg-cyan-50 p-4"
       />
     </form>
-    {#each options as option}
+    {#each optionShown as option}
       <div
         class="my-4 flex items-center justify-between rounded-xl bg-cyan-800 px-2"
       >
@@ -59,7 +68,6 @@
               class="cursor-pointer"
               formaction={`?/increaseVote&opinionId=${option.id}`}>+</button
             >
-            <!-- This is not working as I expected -->
             <p>
               {changed.get(option.id)
                 ? optimisticVotes.get(option.id)
