@@ -9,6 +9,7 @@ export const poll = sqliteTable("question", {
 
 export const options = sqliteTable("options", {
   id: integer("id").primaryKey(),
+  opinion: text("opinion").notNull(),
   pollId: integer("pollId")
     .references(() => poll.id)
     .notNull(),
